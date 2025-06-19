@@ -43,6 +43,7 @@ class MorePanelConfig {
   static final int VIDEO_MAX_SIZE = 100 * 1024 * 1024;
   static final int IMAGE_MAX_SIZE = 28 * 1024 * 1024;
 
+  final bool showVideoPickAction;
   final bool showGalleryPickAction;
   final bool showCameraAction;
   final bool showFilePickAction;
@@ -55,6 +56,7 @@ class MorePanelConfig {
 
   MorePanelConfig({
     this.showFilePickAction = true,
+    this.showVideoPickAction = true,
     this.showGalleryPickAction = true,
     this.showCameraAction = true,
     this.showWebImagePickAction = true,
@@ -305,6 +307,14 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
 
       if (element.id == "file") {
         return config.showFilePickAction;
+      }
+
+      if (element.id == "take_video") {
+        return config.showVideoPickAction;
+      }
+
+      if (element.id == "take_photo") {
+        return config.showCameraAction;
       }
 
       if (element.id == "photo") {
@@ -688,20 +698,59 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
     final TUIChatSeparateViewModel model = Provider.of<TUIChatSeparateViewModel>(context);
     final screenWidth = MediaQuery.of(context).size.width;
     return Container(
-      height: 248,
-      decoration: BoxDecoration(
-        // color: hexToColor("EBF0F6"),
-        border: Border(
-          top: BorderSide(width: 1, color: Colors.grey.shade300),
-        ),
-      ),
-      padding: const EdgeInsets.only(top: 20, left: 20, right: 20),
+      height: 260,
+      // decoration: BoxDecoration(
+      //   // color: hexToColor("EBF0F6"),
+      //   border: Border(
+      //     top: BorderSide(width: 1, color: Colors.grey.shade300),
+      //   ),
+      // ),
+      padding: const EdgeInsets.only(top: 16, left: 20, right: 20),
       width: screenWidth,
       child: Scrollbar(
         controller: _scrollController,
         child: SingleChildScrollView(
           controller: _scrollController,
-          child: Wrap(
+          child: GridView.count(
+            padding: EdgeInsets.zero,
+            crossAxisCount: 4,
+            childAspectRatio: 60/81,
+            crossAxisSpacing: 30,
+            mainAxisSpacing: 24,
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            children: List.generate(itemList(model, theme).length, (index){
+              var item = itemList(model, theme)[index];
+              return InkWell(
+                  onTap: () {
+                    if (item.onTap != null) {
+                      item.onTap!(context);
+                    }
+                  },
+                  child: widget.morePanelConfig?.actionBuilder != null
+                      ? widget.morePanelConfig?.actionBuilder!(item)
+                      : SizedBox(
+                    height: 94,
+                    width: 64,
+                    child: Column(
+                      children: [
+                        Container(
+                          height: 64,
+                          width: 64,
+                          margin: const EdgeInsets.only(bottom: 4),
+                          decoration: const BoxDecoration(borderRadius: BorderRadius.all(Radius.circular(5))),
+                          child: item.icon,
+                        ),
+                        Text(
+                          item.title,
+                          style: TextStyle(fontSize: 12, color: theme.darkTextColor),
+                        )
+                      ],
+                    ),
+                  ));
+            }),
+          ),
+          /*child: Wrap(
             spacing: (screenWidth - (23 * 2) - 64 * 4) / 3,
             runSpacing: 20,
             children: itemList(model, theme)
@@ -734,6 +783,7 @@ class _MorePanelState extends TIMUIKitState<MorePanel> {
                           )))
                 .toList(),
           ),
+          */
         ),
       ),
     );
