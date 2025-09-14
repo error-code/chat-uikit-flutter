@@ -59,7 +59,7 @@ class _TIMUIKitTextElemState extends TIMUIKitState<TIMUIKitFaceElem> {
         child: Container(
           padding: const EdgeInsets.all(10),
           constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * (isDesktopScreen ? 0.1 : 0.3)),
-          child: isFromNetwork() ? Image.network(widget.path,fit: BoxFit.cover) : Image.asset(createPathFromNative(widget.path),fit: BoxFit.cover),
+          child: isFromNetwork() ? Image.network(widget.path) : Image.asset(createPathFromNative(widget.path)),
         ));
   }
 }
